@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Musinyx</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="viewAuth" class="auth-overlay">
+        <h2>Loading Musinyx...</h2>
+    </div>
+
+    <div class="app-container">
+        <div class="greeting" id="greetingContainer">
+            <span class="highlight">Wassup,</span><br>
+            <span class="name">Music Lover</span>
+        </div>
+        <div class="search-box" id="searchContainer">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" placeholder="Songs, albums, or artists" onkeypress="handleEnter(event)" oninput="handleSearchInput()">
+        </div>
+        <div id="statusText"></div>
+
+        <div id="viewHome">
+            <h3 class="section-title">Recently Played</h3>
+            <div id="lastPlayedContainer" class="list-container"></div>
+            
+            <!-- WADAH BARU BUAT REKOMENDASI YOUTUBE MUSIC -->
+            <div id="homeSectionsContainer"></div>
+        </div>
+
+        <div id="viewSearch" style="display: none;">
+            <h3 class="section-title">Search Results</h3>
+            <div id="resultsContainer" class="list-container"></div>
+        </div>
+
+        <div id="viewPlaylists" style="display: none;">
+            <h3 class="section-title">Your Playlists</h3>
+            <div class="empty-state">Playlist feature coming soon!</div>
+        </div>
+
+        <div id="viewFavorites" style="display: none;">
+            <h3 class="section-title">Liked Songs</h3>
+            <div id="favoritesContainer" class="list-container"></div>
+        </div>
+    </div>
+
+    <div id="playerContainer">
+        <img id="nowPlayingImg" src="https://via.placeholder.com/50" alt="Cover">
+        <div class="player-info">
+            <div id="nowPlayingTitle" class="title">No song playing</div>
+            <div id="nowPlayingArtist" class="artist">-</div>
+        </div>
+        <div class="player-controls">
+            <i class="fas fa-play" id="playPauseBtn" onclick="togglePlay()"></i>
+            <i class="fas fa-step-forward" id="nextBtn" onclick="playNext()"></i>
+        </div>
+        <div class="progress-bar-container"><div class="progress-bar" id="playerProgress"></div></div>
+        <audio id="audioPlayer"></audio>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" id="navHome" onclick="switchView('home')"><i class="fas fa-home"></i><span>Home</span></div>
+        <div class="nav-item" id="navFavorites" onclick="switchView('favorites')"><i class="fas fa-heart"></i><span>Favorites</span></div>
+        <div class="nav-item" id="navPlaylist" onclick="switchView('playlists')"><i class="fas fa-music"></i><span>Playlists</span></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
