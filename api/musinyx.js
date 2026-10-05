@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
   }
 
   const action = req.query.action;
-  const VPS_IP = "http://176.112.152.131:3050";
+  const VPS_IP = "http://143.198.214.247:25583";
 
   if (action === 'search') {
     const q = req.query.q || '';
