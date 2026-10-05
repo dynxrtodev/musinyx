@@ -39,7 +39,7 @@ function handleSearchInput() {
 function handleEnter(event) { if (event.key === "Enter") searchSong(); }
 
 // ==========================================
-// PENCARIAN & BERANDA (VIA VERCEL)
+// PENCARIAN & BERANDA (VIA VERCEL PROXY)
 // ==========================================
 async function searchSong() {
     const rawQuery = document.getElementById("searchInput").value.trim();
@@ -80,11 +80,10 @@ async function loadHomeData() {
                 const secDiv = document.createElement("div");
                 secDiv.innerHTML = `<h3 class="section-title">${section.title}</h3>`;
                 
-                // Pake Slider Horizontal Card ala Spotify
                 const list = document.createElement("div");
                 list.className = "horizontal-scroll-container";
                 
-                const sectionQueue = []; // Bikin queue khusus per section
+                const sectionQueue = []; 
                 
                 section.contents.forEach((item) => {
                     if(!item.videoId) return; 
@@ -148,7 +147,7 @@ function renderLastPlayed() {
 }
 
 // ==========================================
-// PLAYER AUDIO (Nembak Proxy VPS)
+// PLAYER AUDIO (LANGSUNG NEMBAK PTERODACTYL)
 // ==========================================
 function initPlay(song, contextQueue, index) {
     currentQueue = contextQueue;
@@ -157,16 +156,26 @@ function initPlay(song, contextQueue, index) {
 }
 
 async function fetchAndPlayAudio(songObj) {
-    let vidId = songObj.videoId;
-    // URL DIARAHKAN KE VERCEL YANG MENGANDUNG PROXY / STREAM 
-    const audioUrl = `/api/musinyx?action=stream&id=${vidId}`;
-    
-    lastPlayed = lastPlayed.filter(s => s.videoId !== songObj.videoId);
-    lastPlayed.unshift(songObj);
-    if (lastPlayed.length > 20) lastPlayed.pop();
-    localStorage.setItem('musinyx_lastPlayed', JSON.stringify(lastPlayed));
-    if (document.getElementById('viewHome').style.display === 'block') renderLastPlayed();
+    try {
+        let vidId = songObj.videoId;
+        
+        // LANGSUNG NEMBAK KE IP VPS PTERODACTYL BIAR GAK ERROR DOMException
+        const audioUrl = `http://143.198.214.247:25583/stream/${vidId}`;
+        console.log("MEMUTAR URL:", audioUrl);
+        
+        lastPlayed = lastPlayed.filter(s => s.videoId !== songObj.videoId);
+        lastPlayed.unshift(songObj);
+        if (lastPlayed.length > 20) lastPlayed.pop();
+        localStorage.setItem('musinyx_lastPlayed', JSON.stringify(lastPlayed));
+        if (document.getElementById('viewHome').style.display === 'block') renderLastPlayed();
 
+        updatePlayerUI(audioUrl, songObj);
+    } catch (error) {
+        console.error("DEBUG ERROR:", error);
+    }
+}
+
+function updatePlayerUI(audioUrl, songObj) {
     currentlyPlayingSong = songObj;
     
     // Update Mini Player
@@ -180,8 +189,16 @@ async function fetchAndPlayAudio(songObj) {
     document.getElementById("npArtist").innerText = songObj.artists;
 
     const audioPlayer = document.getElementById("audioPlayer");
-    audioPlayer.src = audioUrl;
-    audioPlayer.play();
+    if (audioPlayer) {
+        // PAUSE DULU BIAR GAK TABRAKAN
+        audioPlayer.pause();
+        audioPlayer.src = audioUrl;
+        
+        // KASIH DELAY DIKIT SEBELUM PLAY
+        setTimeout(() => {
+            audioPlayer.play().catch(e => console.log("Play interrupted:", e));
+        }, 50);
+    }
     
     document.getElementById("playerContainer").classList.add("show");
     document.getElementById('playPauseBtn').className = "fas fa-pause";
@@ -191,10 +208,13 @@ async function fetchAndPlayAudio(songObj) {
 function togglePlay() {
     const audioPlayer = document.getElementById('audioPlayer');
     const isPaused = audioPlayer.paused;
-    if (isPaused && audioPlayer.src) audioPlayer.play();
-    else if (!isPaused) audioPlayer.pause();
+    if (isPaused && audioPlayer.src) {
+        audioPlayer.play().catch(e => console.log(e));
+    } else if (!isPaused) {
+        audioPlayer.pause();
+    }
     
-    const iconClass = isPaused ? "fas fa-pause" : "fas fa-play";
+    const iconClass = audioPlayer.paused ? "fas fa-play" : "fas fa-pause";
     document.getElementById('playPauseBtn').className = iconClass;
     document.getElementById('npPlayPauseBtn').className = iconClass;
 }
