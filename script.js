@@ -159,8 +159,8 @@ async function fetchAndPlayAudio(songObj) {
     try {
         let vidId = songObj.videoId;
         
-        // LANGSUNG NEMBAK KE IP VPS PTERODACTYL BIAR GAK ERROR DOMException
-        const audioUrl = `http://143.198.214.247:25583/stream/${vidId}`;
+        // Balik nembak ke Vercel API. Vercel bakal nge-redirect ke HTTPS Savetube!
+        const audioUrl = `/api/musinyx?action=stream&id=${vidId}`;
         console.log("MEMUTAR URL:", audioUrl);
         
         lastPlayed = lastPlayed.filter(s => s.videoId !== songObj.videoId);
